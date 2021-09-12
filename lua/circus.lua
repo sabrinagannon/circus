@@ -66,11 +66,6 @@ local function update_view()
     result[k] = '  '..result[k]
   end
 
-  api.nvim_buf_set_lines(buf, 0, -1, false, {
-      center('How many plates are spinning?'), -- Centered plugin title
-      ''
-    })
-
   api.nvim_buf_set_lines(buf, 3, -1, false, result)
 
   api.nvim_buf_add_highlight(buf, -1, 'CircusHeader', 0, 0, -1)
