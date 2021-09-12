@@ -59,7 +59,7 @@ end
 -- Function to get data to show in the window we created above, updates the view repeatedly
 local function update_view()
   -- try just using the nvim eval command to list sessions in a hardcoded directory
-  local result = api.nvim_exec(':so ~/vim-sessions/*.vim<C-D>')
+  local result = api.nvim_exec(':so ~/vim-sessions/*.vim<C-D>', true)
 
   -- with small indentation results will look better
   for k,v in pairs(result) do
