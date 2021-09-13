@@ -57,14 +57,25 @@ local function open_window()
 end
 
 -- Function to get data to show in the window we created above, updates the view repeatedly
+local position = 0 -- Param to store information on if we want an older or newer state
 local function update_view()
-  -- using bash to list sessions in a hardcoded directory
-  local result = vim.fn.systemlist('ls ~/vim-sessions/*.vim')
+  position = position + direction
+  if position < 0 then position = 0 end -- HEAD~0 is the newest state
+
+  -- we will use vim systemlist function which run shell
+  -- command and return result as list
+  local result = vim.fn.systemlist('git diff-tree --no-commit-id --name-only -r  HEAD~'..position)
 
   -- with small indentation results will look better
   for k,v in pairs(result) do
     result[k] = '  '..result[k]
   end
+
+  api.nvim_buf_set_lines(buf, 0, -1, false, {
+      center('How many plates are spinning?'), -- Centered plugin title
+      center('HEAD~'..position), -- Centered indication of where we are in the history
+      ''
+    })
 
   api.nvim_buf_set_lines(buf, 3, -1, false, result)
 
@@ -99,7 +110,11 @@ end
 
 local function set_mappings()
   local mappings = {
+    ['['] = 'update_view(-1)',
+    [']'] = 'update_view(1)',
     ['<cr>'] = 'open_file()',
+    h = 'update_view(-1)',
+    l = 'update_view(1)',
     q = 'close_window()',
     k = 'move_cursor()'
   }
@@ -120,9 +135,10 @@ local function set_mappings()
 end
 
 local function circus()
+  position = 0
   open_window()
   set_mappings()
-  update_view()
+  update_view(0)
   api.nvim_win_set_cursor(win, {4, 0})
 end
 
